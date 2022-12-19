@@ -1,0 +1,93 @@
+---
+title: "Determine the mutation type for a set of single nucleotide variants in a genome"
+author: "Paola Maragno"
+date: "2022-12-12"
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Determine the mutation type for a set of single nucleotide variants in a genome}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis'}
+library(BiocStyle)
+```
+
+```{r, echo = FALSE}
+library(knitr)
+```
+
+```{r, echo = FALSE}
+library(mutType)
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Introduction
+
+The `r Rpackage("mutType")` package - starting from a set of single nucleotide variants in VCF format, the corresponding reference genome and a parameter "context_length" specified by the user - determines for each mutation the corresponding mutation type UP[REF>ALT]DOWN such that all mutation types have C or T as mutated reference base. The overall length of the mutation type is determined by the context_length parameter specified by the user.
+The package also provides a function which summarizes the mutation types for the set of mutations into a count table.
+Eventually the function generates a pdf file showing the barplot visualization of all the mutation types with a frequency higher than a threshold specified by the user.
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Determine the mutation type of a set of single nucleotide variants
+
+The function **mutation_type** takes as input:
+
+* **vcf_file**: VCF file containing a set of single nucleotide variants
+* **reference_genome**: Reference genome 
+* **context_length**: Parameter specified by the user to indicate the overall length of the mutation type - it is used to compute how many nucleotides upstream and downstream the SNV base include in the mutation type. It must be odd.
+
+The function returns a list of two elements: the mutation types UP[REF>ALT]DOWN vector - of the set of single nucleotide variants collected in the VCF file - with C or T as mutated reference base and the GRanges object containing first the SNVs with C or T as mutated reference base and then the SNVs with G or A as mutated reference base - so that the position of each mutation type in the vector is the same of the corresponding SNV in the GRanges object returned by the function. The output of this function is shown in this example:
+  
+```{r}
+library('BSgenome.Hsapiens.UCSC.hg19')
+
+vcf_file <- system.file("extdata", "chr22.vcf.gz", package="VariantAnnotation")
+results <- mutation_type(vcf_file, BSgenome.Hsapiens.UCSC.hg19, 5)
+mut_types <- results[[1]]
+mutgr_reordered <- results[[2]]
+mut_types[1:10]
+mutgr_reordered[1:10]
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Count table of mutation types
+
+The function **count_table** takes as input:
+
+* **mut_types**: Vector of mutation types UP[REF>ALT]DOWN returned by *mutation_type* function.
+
+The function summarizes the list of mutation types UP[REF>ALT]DOWN into a count table reporting the number of mutations per mutation type, as shown below:
+  
+```{r}
+mut_types <- c("GT[C>A]CA", "GG[C>G]TC", "CC[T>C]TC", "GT[C>T]GT", "TA[C>A]CG", "GT[C>A]CA", "CA[C>G]CT", "CC[T>C]CT", "CA[T>C]AT", "TT[C>G]TC", "CC[T>C]CT", "CT[T>C]TG", "CC[T>C]CT", "TA[C>A]CG")
+count_table(mut_types)
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+
+# Graphical visualization of the mutation types with a frequency higher than a threshold
+
+The function **graphical_summary** takes as input:
+
+* **c_table**: Count table returned by *count_table* function that summarizes the mutation types contained in a VCF file
+* **freq**: Threshold of frequency that a mutation type must have at least in order to be visualized in the barplot
+* **file_name**: Name of the pdf file in which the function will plot its graphical output.
+
+The function returns the name of the pdf file - that is named as chosen by the user and it is stored in the working directory - showing the barplot visualization of the frequencies of the mutation types with a frequency at least equal to *freq* threshold, as shown below:
+  
+```{r}
+c_table <- data.frame(mut_types = c("AA[C>A]AA", "AA[C>A]AC", "AA[C>A]AG", "AA[C>A]AT", "AA[C>A]CA", "AA[C>A]CC",
+                                     "AA[C>A]CT", "AA[C>A]GA", "AA[C>A]GC", "AA[C>A]GG", "AA[C>A]GT", "AA[C>A]TA", 
+                                     "AA[C>A]TC"), 
+                      Freq = c(15,  13,  32,  44,  25,  5,  67,  21,  14,  42,  52,  21,  19))
+graphical_summary(c_table, 30, "Mut_types_visualization_30.pdf")
+```

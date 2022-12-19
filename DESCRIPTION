@@ -1,0 +1,29 @@
+Package: mutType
+Type: Package
+Title: Determine the mutation type for a set of single nucleotide variants in a genome
+Version: 0.99.0
+Date: 2022-12-12
+Authors@R: c(
+    person(given = "Paola",
+           family = "Maragno",
+           role = c("aut", "cre"),
+           email = "paola.maragno@mail.polimi.it")
+    )
+Description: Starting from a set of single nucleotide variants in VCF format, the corresponding 
+    reference genome and a parameter 'context_length' specified by the user, the package 
+    function 'mutation_type' determines for each mutation the corresponding mutation type 
+    'UP[REF>ALT]DOWN' such that all mutation types have C or T as mutated reference base.
+    The overall length of the mutation type is determined by the context_length parameter. 
+    The package function 'count_table' summarizes the mutation types for the set of mutations 
+    into a count table that reports the number of mutations per mutation type.
+    Eventually the package function 'graphical_summary' generates a pdf file showing the barplot 
+    visualization of all the mutation types with a frequency higher than a threshold specified 
+    by the user.
+Depends: R(>= 3.6.0)
+Imports: VariantAnnotation, ggplot2, Biostrings, grDevices, BSgenome, GenomicRanges, IRanges
+Suggests: knitr, rmarkdown, BiocStyle, testthat, pdftools, BSgenome.Hsapiens.UCSC.hg19, BiocManager
+License: GPL-2
+Encoding: UTF-8
+VignetteBuilder: knitr
+biocViews: SNP, VariantAnnotation, BiomedicalInformatics, Genetics, Sequencing, Software
+RoxygenNote: 7.2.3
