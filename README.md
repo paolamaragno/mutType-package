@@ -8,5 +8,4 @@ mutation type.
 Eventually the package function 'graphical_summary' generates a pdf file showing the barplot visualization of all the mutation types with a frequency 
 higher than a threshold specified by the user.
 
-Please visualize the vignette of the package for more information:
-browseVignettes('mutType')
+Please visualize the vignette of the package for more information.
